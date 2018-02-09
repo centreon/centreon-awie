@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2005-2017 Centreon
+ * Copyright 2005-2018 Centreon
  * Centreon is developped by : Julien Mathis and Romain Le Merlus under
  * GPL Licence 2.0.
  *
@@ -38,6 +38,7 @@ if (!isset($oreon)) {
 }
 
 require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/centreon-awie.conf.php';
+require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/core/DB-Func.php';
 require_once _CENTREON_PATH_ . '/www/lib/HTML/QuickForm.php';
 require_once _CENTREON_PATH_ . '/www/lib/HTML/QuickForm/Renderer/ArraySmarty.php';
 //require_once _MODULE_PATH_ . 'core/help.php';
@@ -56,49 +57,61 @@ if ($form->validate()) {
 }
 
 $form->addElement('header', 'title', _("Api Web Exporter"));
-
-$exportAllOpt[] = HTML_QuickForm::createElement(
-    'checkbox',
-    'all',
-    '&nbsp;',
-    _("All"),
-    array('id' => 'all', 'onClick' => 'selectAll(this);')
-);
-$form->addGroup($exportAllOpt, 'export_all', _("Export resources"), '&nbsp;&nbsp;');
-
+//CMD
 $exportCmd[] = HTML_QuickForm::createElement('checkbox', 'c_cmd', '&nbsp;', _("Check CMD"));
 $exportCmd[] = HTML_QuickForm::createElement('checkbox', 'n_cmd', '&nbsp;', _("Notification CMD"));
 $exportCmd[] = HTML_QuickForm::createElement('checkbox', 'm_cmd', '&nbsp;', _("Misc CMD"));
 $exportCmd[] = HTML_QuickForm::createElement('checkbox', 'd_cmd', '&nbsp;', _("Discovery CMD"));
 $form->addGroup($exportCmd, 'export_cmd', '', '&nbsp;');
 
-$exportOpt[] = HTML_QuickForm::createElement('checkbox', 'tp', '&nbsp;', _("Timeperiods"));
-$exportOpt[] = HTML_QuickForm::createElement('checkbox', 'c', '&nbsp;', _("Contacts"));
-$exportOpt[] = HTML_QuickForm::createElement('checkbox', 'cg', '&nbsp;', _("Contactgroups"));
-$form->addGroup($exportOpt, 'simple_export', '', '&nbsp;');
+//Contact
+$form->addElement('checkbox', 'tp', '&nbsp;', _("Timeperiods"));
+$form->addElement('checkbox', 'c', '', _("Contacts"));
+$form->addElement('checkbox', 'cg', '', _("Contactgroups"));
 
-$form->addElement('checkbox', 'host', '&nbsp;', _("Host"));
-$form->addElement('text', 'host_filter', '', 120);
+//Host
+$exportHost[] = HTML_QuickForm::createElement(
+    'checkbox',
+    'host',
+    '&nbsp;',
+    _("Host"),
+    array("onclick" => "selectFilter('host');")
+);
+$exportHost[] = HTML_QuickForm::createElement('text', 'host_filter', '', array("style" => "display:none"));
+$form->addGroup($exportHost, 'export_host', '', '&nbsp;');
 
-$form->addElement('checkbox', 'htpl', '&nbsp;', _("HTPL"));
-$form->addElement('text', 'htpl_filter', '', 120);
+$exportHtpl[] = HTML_QuickForm::createElement(
+    'checkbox',
+    'htpl',
+    '&nbsp;',
+    _("HTPL"),
+    array("onclick" => "selectFilter('htpl');")
+);
+$exportHtpl[] = HTML_QuickForm::createElement('text', 'htpl_filter', '', array("style" => "display:none"));
+$form->addGroup($exportHtpl, 'export_htpl', '', '&nbsp;');
 
 $form->addElement('checkbox', 'host_c', '&nbsp;', _("Host Categories"));
 
-$form->addElement('checkbox', 'svc', '&nbsp;', _("Services"));
-$form->addElement('text', 'svc_filter', '', 120);
+//Service
+$exportSvc[] = HTML_QuickForm::createElement('checkbox', 'host', '&nbsp;', _("Services"), array("onclick" => "selectFilter('svc');"));
+$exportSvc[] = HTML_QuickForm::createElement('text', 'svc_filter', '', array("style" => "display:none"));
+$form->addGroup($exportSvc, 'export_svc', '', '&nbsp;');
 
-$form->addElement('checkbox', 'stpl', '&nbsp;', _("STPL"));
-$form->addElement('text', 'stpl_filter', '', 120);
+$exportStpl[] = HTML_QuickForm::createElement('checkbox', 'stpl', '&nbsp;', _("STPL"), array("onclick" => "selectFilter('stpl');"));
+$exportStpl[] = HTML_QuickForm::createElement('text', 'stpl_filter', '', array("style" => "display:none"));
+$form->addGroup($exportStpl, 'export_stpl', '', '&nbsp;');
 
 $form->addElement('checkbox', 'svc_c', '&nbsp;', _("Service Categories"));
 
-$exportConnect[] = HTML_QuickForm::createElement('checkbox', 'acl', '&nbsp;', _("ACL"));
-$exportConnect[] = HTML_QuickForm::createElement('checkbox', 'ldap', '&nbsp;', _("LDAP"));
-$form->addGroup($exportConnect, 'export_connect', '', '&nbsp;');
 
-$form->addElement('checkbox', 'poller', '&nbsp;', _("Poller"));
-$form->addElement('text', 'poller_filter', '', 120);
+//Connexion
+$form->addElement('checkbox', 'acl', '', _("ACL"));
+$form->addElement('checkbox', 'ldap', '', _("LDAP"));
+
+//Poller
+$exportPoller[] = HTML_QuickForm::createElement('checkbox', 'poller', '&nbsp;', _("Poller"), array("onclick" => "selectFilter('poller');"));
+$exportPoller[] = HTML_QuickForm::createElement('text', 'poller_filter', '', array("style" => "display:none"));
+$form->addGroup($exportPoller, 'export_poller', '', '&nbsp;');
 
 $subC = $form->addElement('submit', 'submitC', _("Export"), array("class" => "btc bt_success"));
 $res = $form->addElement('reset', 'reset', _("Reset"));
@@ -107,20 +120,17 @@ if ($valid) {
     $form->freeze();
 }
 
-
 $renderer = new HTML_QuickForm_Renderer_ArraySmarty($tpl, true);
 $form->accept($renderer);
-
-/*
-$helpText = "";
-foreach ($help as $key => $text) {
-    $helpText .= '<span style="display:none" id="help:' . $key . '">' . $text . '</span>' . "\n";
-}
-$tpl->assign("helpText", $helpText);
-*/
-
 $tpl->assign('form', $renderer->toArray());
 $tpl->assign('valid', $valid);
-
-
 $tpl->display($export . "/templates/formExport.tpl");
+
+
+$valid = false;
+if ($form->validate()) {
+    $valid = true;
+    ExportFile($form->getSubmitValues());
+}
+
+

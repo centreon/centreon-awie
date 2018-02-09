@@ -8,49 +8,50 @@
         <tr class="list_one">
             <td class="FormRowField"><img class="helpTooltip" name="notification_options"> {$form.export_all.label}
             </td>
-            <td class="FormRowValue">{$form.export_all.html}</td>
-        </tr>
-        <tr class="list_two">
-            <td class="FormRowField"></td>
             <td class="FormRowValue">{$form.export_cmd.html}</td>
         </tr>
         <tr class="list_one">
             <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.simple_export.html}</td>
+            <td class="FormRowValue">{$form.tp.html} {$form.c.html} {$form.cg.html}</td>
         </tr>
         <tr class="list_two">
             <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.host.html} {$form.host_filter.html}</td>
+            <td class="FormRowValue">{$form.export_host.html}</td>
+        </tr>
+
+        <tr class="list_one">
+            <td class="FormRowField"></td>
+            <td class="FormRowValue">{$form.export_htpl.html}</td>
+        </tr>
+        <tr class="list_two">
+            <td class="FormRowField"></td>
+            <td class="FormRowValue">{$form.host_c.html}</td>
         </tr>
         <tr class="list_one">
             <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.htpl.html} {$form.htpl_filter.html}</td>
+            <td class="FormRowValue">{$form.export_svc.html}</td>
         </tr>
         <tr class="list_two">
             <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.host_c.html} </td>
+            <td class="FormRowValue">{$form.export_stpl.html}</td>
         </tr>
         <tr class="list_one">
             <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.svc.html} {$form.svc_filter.html}</td>
+            <td class="FormRowValue">{$form.svc_c.html}</td>
         </tr>
         <tr class="list_two">
             <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.stpl.html} {$form.stpl_filter.html}</td>
+            <td class="FormRowValue">{$form.acl.html} {$form.ldap.html}</td>
         </tr>
         <tr class="list_one">
             <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.export_connect.html}</td>
-        </tr>
-        <tr class="list_two">
-            <td class="FormRowField"></td>
-            <td class="FormRowValue">{$form.poller.html} {$form.poller_filter.html}</td>
+            <td class="FormRowValue">{$form.export_poller.html}</td>
         </tr>
     </table>
 
     {if !$valid}
         <div id="validForm">
-            <p>{$form.submitC.html}{$form.submitA.html}</p>
+            <p>{$form.submitC.html}</p>
         </div>
     {else}
         <div id="validForm">
@@ -61,3 +62,14 @@
     {$form.hidden}
 </form>
 {$helpText}
+{literal}
+    <script type='text/javascript'>
+        function selectFilter(selected) {
+            if (jQuery('[name = "export_' + selected + '[' + selected +'_filter]"]').css('display') == 'none') {
+                jQuery('[name = "export_' + selected + '[' + selected +'_filter]"]').css('display', 'block');
+            } else {
+                jQuery('[name = "export_' + selected + '[' + selected +'_filter]"]').css('display', 'none');
+            }
+        }
+    </script>
+{/literal}
