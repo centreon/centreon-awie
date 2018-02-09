@@ -20,47 +20,57 @@ if (!isset($oreon)) {
 }
 
 require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/centreon-awie.conf.php';
-require_once _CENTREON_PATH_ . '/www/lib/HTML/QuickForm.php';
-require_once _CENTREON_PATH_ . '/www/lib/HTML/QuickForm/Renderer/ArraySmarty.php';
-//require_once _MODULE_PATH_ . 'core/help.php';
+require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/core/DB-Func.php';
 
 $import = realpath(dirname(__FILE__));
 // Smarty template Init
 $path = _MODULE_PATH_ . "/core/template/";
 $tpl = new Smarty();
 $tpl = initSmartyTpl($path, $tpl);
-$form = new HTML_QuickForm('Form', 'post', "?p=" . $p);
 
-$valid = false;
-if ($form->validate()) {
-    $valid = true;
-    $form->freeze();
+if (!is_null($_POST['validate'])) {
+    $uploaddir = '/clapi/';
+    $uploadfile = $uploaddir.basename($_FILES['clapiImport']['name']);
+
+    /**
+     * Upload du fichier
+     */
+    if (move_uploaded_file($_FILES['clapiImport']['tmp_name'], $uploadfile)) {
+        echo "Le fichier est valide, et a été téléchargé
+           avec succès. Voici plus d'informations :\n";
+    } else {
+        echo "Attaque potentielle par téléchargement de fichiers.
+          Voici plus d'informations :\n";
+    }
+
+    /**
+     * Dezippe du fichier
+     */
+    $zip = new ZipArchive;
+    $confPath = '/usr/share/centreon/filesUpload';
+
+    if ($zip->open($uploadfile) === true) {
+        $zip->extractTo($confPath);
+        $zip->close();
+        echo 'ok';
+    } else {
+        if ($zip->open($uploadfile) === false) {
+            throw new \Exception('Ça marche pas');
+        }
+    }
+
+    /**
+     * Utilisation de la commande d'import CLAPI
+     * ./centreon -u admin -p centreon -i /tmp/clapi-export.txt
+     */
+
+    exec("centreon -u admin -p centreon -i /usr/share/centreon/filesUpload/clapi-export\ 2.txt");
+    header('Location: '.'http://10.30.2.57/centreon/main.php?p=61202');
+    exit();
 }
 
-$form->addElement('header', 'title', _("Api Web Import"));
+/**
+ * Logs
+ */
 
-
-$subC = $form->addElement('submit', 'submitC', _("Import"), array("class" => "btc bt_success"));
-$res = $form->addElement('reset', 'reset', _("Reset"));
-
-if ($valid) {
-    $form->freeze();
-}
-
-
-$renderer = new HTML_QuickForm_Renderer_ArraySmarty($tpl, true);
-$form->accept($renderer);
-
-/*
-$helpText = "";
-foreach ($help as $key => $text) {
-    $helpText .= '<span style="display:none" id="help:' . $key . '">' . $text . '</span>' . "\n";
-}
-$tpl->assign("helpText", $helpText);
-*/
-
-$tpl->assign('form', $renderer->toArray());
-$tpl->assign('valid', $valid);
-
-
-$tpl->display($import . "/templates/formExport.tpl");
+$tpl->display($import . "/templates/formImport.tpl");
