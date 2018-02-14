@@ -21,6 +21,22 @@ if (!isset($oreon)) {
 
 require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/centreon-awie.conf.php';
 require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/core/DB-Func.php';
+require_once _CENTREON_PATH_ . '/www/class/centreon-clapi/centreonAPI.class.php';
+require_once _CENTREON_PATH_ . '/www/class/centreon-clapi/centreonUtils.class.php';
+require_once _CENTREON_PATH_ . "/lib/Centreon/Db/Manager/Manager.php";
+
+
+define('_CLAPI_CLASS_', _CENTREON_PATH_ . '/www/class/centreon-clapi/');
+define('_CLAPI_LIB_', _CENTREON_PATH_ . '/lib/');
+
+set_include_path(implode(
+    PATH_SEPARATOR,
+    array(
+        realpath(_CLAPI_LIB_),
+        realpath(_CLAPI_CLASS_),
+        get_include_path()
+    )
+));
 
 $import = realpath(dirname(__FILE__));
 // Smarty template Init
@@ -29,11 +45,11 @@ $tpl = new Smarty();
 $tpl = initSmartyTpl($path, $tpl);
 
 if (!is_null($_POST['validate'])) {
-    $uploaddir = '/clapi/';
-    $uploadfile = $uploaddir.basename($_FILES['clapiImport']['name']);
+    $uploaddir = '/usr/share/centreon/filesUpload/';
+    $uploadfile = $uploaddir . basename($_FILES['clapiImport']['name']);
 
     /**
-     * Upload du fichier
+     * Upload file
      */
     if (move_uploaded_file($_FILES['clapiImport']['tmp_name'], $uploadfile)) {
         echo "Le fichier est valide, et a été téléchargé
@@ -44,33 +60,63 @@ if (!is_null($_POST['validate'])) {
     }
 
     /**
-     * Dezippe du fichier
+     * Dezippe file
      */
     $zip = new ZipArchive;
-    $confPath = '/usr/share/centreon/filesUpload';
+    $confPath = '/usr/share/centreon/filesUpload/';
 
     if ($zip->open($uploadfile) === true) {
         $zip->extractTo($confPath);
         $zip->close();
-        echo 'ok';
     } else {
         if ($zip->open($uploadfile) === false) {
-            throw new \Exception('Ça marche pas');
+            echo'Ça marche pas';
         }
     }
 
     /**
-     * Utilisation de la commande d'import CLAPI
-     * ./centreon -u admin -p centreon -i /tmp/clapi-export.txt
+     * DB
      */
+    $dbConfig['host'] = $conf_centreon['hostCentreon'];
+    $dbConfig['username'] = $conf_centreon['user'];
+    $dbConfig['password'] = $conf_centreon['password'];
+    $dbConfig['dbname'] = $conf_centreon['db'];
+    if (isset($conf_centreon['port'])) {
+        $dbConfig['port'] = $conf_centreon['port'];
+    } elseif ($p = strstr($dbConfig['host'], ':')) {
+        $p = substr($p, 1);
+        if (is_numeric($p)) {
+            $dbConfig['port'] = $p;
+        }
+    }
+    $db = Centreon_Db_Manager::factory('centreon', 'pdo_mysql', $dbConfig);
+    $db->query('SET NAMES utf8');
+    $dbConfig['dbname'] = $conf_centreon['dbcstg'];
+    $db_storage = Centreon_Db_Manager::factory('storage', 'pdo_mysql', $dbConfig);
+    try {
+        $db->getConnection();
+        $db_storage->getConnection();
+    } catch (Exception $e) {
+        echo sprintf("Could not connect to database. Check your configuration file %s\n", _CENTREON_ETC_.'/centreon.conf.php');
+        if (isset($options['h'])) {
+            CentreonClapi\CentreonAPI::printHelp(false, 1);
+        }
+        exit(1);
+    }
 
-    exec("centreon -u admin -p centreon -i /usr/share/centreon/filesUpload/clapi-export\ 2.txt");
-    header('Location: '.'http://10.30.2.57/centreon/main.php?p=61202');
-    exit();
+    /**
+     * Set log_contact
+     */
+    $username = $centreon->user->alias;
+    CentreonClapi\CentreonUtils::setUserName($username);
+
+    /**
+     * Using CLAPI command to import configuration
+     * Exemple -> "./centreon -u admin -p centreon -i /tmp/clapi-export.txt"
+     */
+    $finalFile = $confPath . basename($uploadfile, '.zip');
+    $clapiObj = new \CentreonClapi\CentreonAPI('','','','','','');
+    $clapiObj->import($finalFile);
 }
-
-/**
- * Logs
- */
 
 $tpl->display($import . "/templates/formImport.tpl");
