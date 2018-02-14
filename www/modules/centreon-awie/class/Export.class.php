@@ -18,8 +18,10 @@ class Export
     protected $bash = array();
     protected $user = '';
     protected $pwd = '';
-    protected $tmpFile = '/tmp/ExportTmp.txt';
+    protected $tmpFile = '';
+    protected $tmpName = '';
     protected $db;
+    protected $outputValue = array();
 
     /**
      * Export constructor.
@@ -37,12 +39,16 @@ class Export
         }
         $this->user = 'superadmin';
         $this->pwd = 'centreon';
+
+        $this->tmpName = 'centreon-clapi-export-' . time();
+        $this->tmpFile = '/tmp/' . $this->tmpName . '.txt';
+
     }
 
     /**
      * @param $type
      */
-    public function ExportCmd($type)
+    public function GenerateCmd($type)
     {
         $cmdTypeRelation = array(
             'n' => 1,
@@ -61,20 +67,20 @@ class Export
      * @param $object
      * @param $value
      */
-    public function ExportGroup($object, $value)
+    public function GenerateGroup($object, $value)
     {
         if ($object == 'cmd') {
             foreach ($value as $cmdType => $val) {
                 $type = explode('_', $cmdType);
-                $this->ExportCmd($type[0]);
+                $this->GenerateCmd($type[0]);
             }
         } else {
             if (isset($value[$object])) {
                 $filter = '';
-                if (empty($value[$object])) {
-                    $filter = ';' . $value[$object];
+                if (!empty($value[$object . '_filter'])) {
+                    $filter = ';' . $value[$object . '_filter'];
                 }
-                $this->ExportObject($object, $filter);
+                $this->GenerateObject($object, $filter);
             }
         }
     }
@@ -83,95 +89,75 @@ class Export
      * @param $object
      * @param string $filter
      */
-    public function ExportObject($object, $filter = '')
+    public function GenerateObject($object, $filter = '')
     {
-        $this->bash[] = "centreon -u $this->user -p $this->pwd -e --select='$object$filter'";
+        if ($object == 'ACL') {
+            $this->GenerateAcl();
+        } else {
+            $this->bash[] = "centreon -u $this->user -p $this->pwd -e --select='$object$filter'";
+        }
+
     }
 
     /**
      *
      */
-    public function ExportByClapi()
+    public function GenerateAcl()
     {
+        $oAcl = array('ACLMENU', 'ACLACTION', 'ACLRESOURCE', 'ACLGROUP');
+        foreach ($oAcl as $acl) {
+            $this->GenerateObject($acl);
+        }
+    }
+
+    /**
+     *
+     */
+    public function ClapiExport()
+    {
+        $fp = fopen($this->tmpFile, 'w');
         foreach ($this->bash as $command) {
-            exec($command, $output);
-            foreach ($output as $line) {
-                $this->tmpFile = '/tmp/ExportTmp.txt';
-                file_put_contents($this->tmpFile, $line . "\n", FILE_APPEND);
+            exec($command, $output, $error);
+            if ($error == 1) {
+                $this->outputValue[] = $output[0];
+            } else {
+                foreach ($output as $line) {
+                    fwrite($fp, $line . "\n");
+                }
             }
         }
+        fclose($fp);
+        // $archive = '/tmp/' . $this->tmpName . '.zip';
+        $this->outputValue['fileGenerate'] = $this->tmpName;
 
-        //   var_dump(file_get_contents($this->tmpFile));
-        $this->zipFilesAndDownload($this->tmpFile, '/tmp/toto.zip');
-
+        return $this->outputValue;
     }
 
 
-    function zipFilesAndDownload($fileNames, $archiveName)
+    public function zipFilesAndDownload($fileNames)
     {
+        $archivePath = '/tmp/' . $fileNames . '.zip';
+        $filePath = '/tmp/' . $fileNames . '.txt';
+
         //echo $file_path;die;
         $zip = new ZipArchive();
         //create the file and throw the error if unsuccessful
-        if ($zip->open($archiveName, ZIPARCHIVE::CREATE) !== true) {
-            exit("cannot open <$archiveName>\n");
+        if ($zip->open($archivePath, ZIPARCHIVE::CREATE) !== true) {
+            exit("cannot open <$archivePath>\n");
         }
 
-        $zip->addFile($fileNames);
-
+        $zip->addFile($filePath, basename($filePath));
         $zip->close();
-        //then send the headers to force download the zip file
 
-
-    //    $archiveName = '/usr/share/centreon/filesUpload/toto.zip';
-
-
-      //  var_dump(file_exists($archiveName));
-
-        header("Pragma: no-cache");
-        header("Expires: 0");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        header("Cache-Control: public");
-        header("Cache-Control: max-age=0");
-        header("Content-Description: File Transfer");
-        header("Content-type: application/octet-stream");
-        header("Content-Type: application/force-download");
-        header("Content-Disposition: attachment; filename=" . basename($archiveName));
-        header("Content-Transfer-Encoding: binary");
-        header("Content-Length: ".filesize($archiveName));
-        header('Connection: close');
-        readfile($archiveName);
-
-
-//        header('Pragma: public'); 	// required
-//        header('Expires: 0');		// no cache
-//        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-//        header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime ($archiveName)).' GMT');
-//        header('Cache-Control: private',false);
-//        header('Content-Type: application/zip');
-//        header('Content-Disposition: attachment; filename="'.basename($archiveName).'"');
-//        header('Content-Transfer-Encoding: binary');
-//        header('Content-Length: '.filesize($archiveName));	// provide file size
-//        header('Connection: close');
-//        readfile($archiveName);		// push it out
-//
-        exit();
-
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename=' . basename($archivePath));
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($archivePath));
+        readfile($archivePath);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
