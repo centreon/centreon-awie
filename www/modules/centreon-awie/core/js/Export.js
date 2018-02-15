@@ -17,9 +17,8 @@ function submitForm() {
             oData = JSON.parse(data);
             jQuery('#pathFile').val(oData.fileGenerate);
             delete oData.fileGenerate;
-            for (var x in oData) {
-                errorMsg += oData[x] + "\n";
-            }
+            errorMsg += oData.error;
+            errorMsg = errorMsg.replace(",", "\n");
             if (errorMsg.length !== 0) {
                 alert(errorMsg);
             }
@@ -28,12 +27,3 @@ function submitForm() {
     });
     event.preventDefault();
 }
-
-
-
-
-
-
-
-
-

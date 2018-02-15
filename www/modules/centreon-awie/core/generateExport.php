@@ -21,6 +21,22 @@ require_once _CLAPI_CLASS_ . "/centreonUtils.class.php";
 require_once _CLAPI_CLASS_ . "/centreonAPI.class.php";
 
 
+$formValue = array(
+    'export_cmd',
+    'TP',
+    'CONTACT',
+    'CG',
+    'export_HOST',
+    'export_HTPL',
+    'HC',
+    'export_SERVICE',
+    'export_STPL',
+    'SC',
+    'ACL',
+    'LDAP',
+    'export_INSTANCE'
+);
+
 $dbConfig['host'] = $conf_centreon['hostCentreon'];
 $dbConfig['username'] = $conf_centreon['user'];
 $dbConfig['password'] = $conf_centreon['password'];
@@ -38,8 +54,7 @@ if (isset($conf_centreon['port'])) {
 $centreonSession = new CentreonSession();
 $centreonSession->start();
 $username = $_SESSION['centreon']->user->alias;
-$clapiConnector = new \ClapiObject($dbConfig);
-$clapiConnector->addClapiParameter('username', $username);
+$clapiConnector = new \ClapiObject($dbConfig, array('username' => $username));
 
 /*
 * Set log_contact
@@ -47,18 +62,24 @@ $clapiConnector->addClapiParameter('username', $username);
 \CentreonClapi\CentreonUtils::setUserName($username);
 
 $scriptContent = array();
+$ajaxReturn = array();
 
 $oExport = new \Export($clapiConnector);
 
 foreach ($_POST as $object => $value) {
-    $type = explode('_', $object);
-    if ($type[0] == 'export') {
-        $scriptContent[] = $oExport->GenerateGroup($type[1], $value);
-    } elseif ($type[0] != 'submitC') {
-        $scriptContent[] = $oExport->GenerateObject($type[0]);
-    }
-}
 
-$error = $oExport->ClapiExport($scriptContent);
-echo json_encode($error);
+    if(in_array($object, $formValue)){
+        $type = explode('_', $object);
+        if ($type[0] == 'export') {
+            $scriptContent[] = $oExport->GenerateGroup($type[1], $value);
+        } elseif ($type[0] != 'submitC') {
+            $scriptContent[] = $oExport->GenerateObject($type[0]);
+        }
+    } else {
+        $ajaxReturn['error'][] = 'Unknown object : ' . $object;
+    }
+
+}
+$ajaxReturn['fileGenerate'] = $oExport->ClapiExport($scriptContent);
+echo json_encode($ajaxReturn);
 exit;

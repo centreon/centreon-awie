@@ -19,7 +19,6 @@ class Export
     protected $tmpFile = '';
     protected $tmpName = '';
     protected $db;
-    protected $outputValue = array();
     protected $clapiConnector;
 
     /**
@@ -122,7 +121,6 @@ class Export
             fwrite($fp, utf8_encode($command));
         }
         fclose($fp);
-        $this->outputValue['fileGenerate'] = $this->tmpName;
-        return $this->outputValue;
+        return $this->tmpName;
     }
 }

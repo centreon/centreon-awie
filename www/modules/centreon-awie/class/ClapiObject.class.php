@@ -22,8 +22,9 @@ class ClapiObject
     protected $clapiParameters = array();
     protected $clapiConnector;
 
-    public function __construct($dbConfig)
+    public function __construct($dbConfig, $clapiParameters)
     {
+        $this->clapiParameters = $clapiParameters;
         $this->buildDatabaseConfigurations($dbConfig);
         $this->initCentreonConnection();
         $this->initCentreonStorageConnection();
