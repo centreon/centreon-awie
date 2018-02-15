@@ -2,7 +2,7 @@
 /**
  * CENTREON
  *
- * Source Copyright 2005-2015 CENTREON
+ * Source Copyright 2005-2018 CENTREON
  *
  * Unauthorized reproduction, copy and distribution
  * are not allowed.
@@ -10,8 +10,6 @@
  * For more information : contact@centreon.com
  *
  */
-
-require_once _CENTREON_PATH_ . "/config/centreon.config.php";
 
 class Export
 {
@@ -22,34 +20,26 @@ class Export
     protected $tmpName = '';
     protected $db;
     protected $outputValue = array();
+    protected $clapiConnector;
 
     /**
      * Export constructor.
      */
-    public function __construct()
+    public function __construct($clapiConnector)
     {
-        if (is_null($this->db)) {
-            try {
-                $this->db = new \PDO("mysql:dbname=pdo;host=" . hostCentreon . ";dbname=" . db, user, password,
-                    array(\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
-                $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            } catch (\PDOException $e) {
-                echo 'Connexion échouée : ' . $e->getMessage();
-            }
-        }
-        $this->user = 'superadmin';
-        $this->pwd = 'centreon';
-
+        $this->db = new \CentreonDB();
+        $this->clapiConnector = $clapiConnector;
         $this->tmpName = 'centreon-clapi-export-' . time();
         $this->tmpFile = '/tmp/' . $this->tmpName . '.txt';
-
     }
 
     /**
      * @param $type
+     * @return string
      */
-    public function GenerateCmd($type)
+    private function GenerateCmd($type)
     {
+        $cmdScript = '';
         $cmdTypeRelation = array(
             'n' => 1,
             'c' => 2,
@@ -58,21 +48,24 @@ class Export
         );
         $query = 'SELECT `command_name` FROM `command`WHERE `command_type` =' . $cmdTypeRelation[$type];
         $res = $this->db->query($query);
-        while ($row = $res->fetch()) {
-            $this->bash[] = "centreon -u $this->user -p $this->pwd -e --select='CMD;" . $row['command_name'] . "'";
+
+        while ($row = $res->fetchRow()) {
+            $cmdScript .= $this->GenerateObject('CMD', ';' . $row['command_name']);
         }
+        return $cmdScript;
     }
 
     /**
      * @param $object
      * @param $value
+     * @return string
      */
     public function GenerateGroup($object, $value)
     {
         if ($object == 'cmd') {
             foreach ($value as $cmdType => $val) {
                 $type = explode('_', $cmdType);
-                $this->GenerateCmd($type[0]);
+                return $this->GenerateCmd($type[0]);
             }
         } else {
             if (isset($value[$object])) {
@@ -80,7 +73,7 @@ class Export
                 if (!empty($value[$object . '_filter'])) {
                     $filter = ';' . $value[$object . '_filter'];
                 }
-                $this->GenerateObject($object, $filter);
+                return $this->GenerateObject($object, $filter);
             }
         }
     }
@@ -88,76 +81,48 @@ class Export
     /**
      * @param $object
      * @param string $filter
+     * @return string
      */
     public function GenerateObject($object, $filter = '')
     {
+        $content = '';
         if ($object == 'ACL') {
             $this->GenerateAcl();
         } else {
-            $this->bash[] = "centreon -u $this->user -p $this->pwd -e --select='$object$filter'";
+            ob_start();
+            $option = $object . $filter;
+            $this->clapiConnector->addClapiParameter('select', $option);
+            $this->clapiConnector->export();
+            $content .= ob_get_contents();
+            ob_end_clean();
         }
-
+        return $content;
     }
 
     /**
-     *
+     * @return string
      */
-    public function GenerateAcl()
+    private function GenerateAcl()
     {
+        $aclScript = '';
         $oAcl = array('ACLMENU', 'ACLACTION', 'ACLRESOURCE', 'ACLGROUP');
         foreach ($oAcl as $acl) {
-            $this->GenerateObject($acl);
+            $aclScript .= $this->GenerateObject($acl);
         }
+        return $aclScript;
     }
 
     /**
      *
      */
-    public function ClapiExport()
+    public function ClapiExport($content)
     {
         $fp = fopen($this->tmpFile, 'w');
-        foreach ($this->bash as $command) {
-            exec($command, $output, $error);
-            if ($error == 1) {
-                $this->outputValue[] = $output[0];
-            } else {
-                foreach ($output as $line) {
-                    fwrite($fp, $line . "\n");
-                }
-            }
+        foreach ($content as $command) {
+            fwrite($fp, utf8_encode($command));
         }
         fclose($fp);
-        // $archive = '/tmp/' . $this->tmpName . '.zip';
         $this->outputValue['fileGenerate'] = $this->tmpName;
-
         return $this->outputValue;
     }
-
-
-    public function zipFilesAndDownload($fileNames)
-    {
-        $archivePath = '/tmp/' . $fileNames . '.zip';
-        $filePath = '/tmp/' . $fileNames . '.txt';
-
-        //echo $file_path;die;
-        $zip = new ZipArchive();
-        //create the file and throw the error if unsuccessful
-        if ($zip->open($archivePath, ZIPARCHIVE::CREATE) !== true) {
-            exit("cannot open <$archivePath>\n");
-        }
-
-        $zip->addFile($filePath, basename($filePath));
-        $zip->close();
-
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename=' . basename($archivePath));
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($archivePath));
-        readfile($archivePath);
-    }
-
-
 }

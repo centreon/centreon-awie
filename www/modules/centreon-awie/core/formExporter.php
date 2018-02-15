@@ -33,13 +33,16 @@
  *
  */
 
+
 if (!isset($oreon)) {
     exit();
 }
 
 require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/centreon-awie.conf.php';
 require_once _CENTREON_PATH_ . '/www/modules/centreon-awie/core/DB-Func.php';
-//require_once _MODULE_PATH_ . 'core/help.php';
+require_once _CENTREON_PATH_ . '/www/class/centreon-clapi/centreonAPI.class.php';
+
+
 
 $export = './modules/centreon-awie/core/submitExport.php';
 // Smarty template Init
