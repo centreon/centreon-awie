@@ -19,7 +19,7 @@ function submitForm() {
             delete oData.fileGenerate;
             errorMsg += oData.error;
             errorMsg = errorMsg.replace(",", "\n");
-            if (errorMsg.length !== 0) {
+            if (errorMsg.length !== 0 && errorMsg !== 'undefined') {
                 alert(errorMsg);
             }
             jQuery("#downloadForm").submit();
