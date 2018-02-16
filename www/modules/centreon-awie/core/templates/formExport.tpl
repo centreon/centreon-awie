@@ -40,8 +40,8 @@
             <td class="FormRowField"></td>
             <td class="FormRowValue">
                 <input onclick="selectFilter('HOST');" name="export_HOST[HOST]" type="checkbox" id="host"/>
-                <label for="host">Host</label>
-                <input style="display:none" name="export_HOST[HOST_filter]" type="txt"/>
+                <label for="host">Hosts</label>
+                <input style="display:none" placeholder="filter" name="export_HOST[HOST_filter]" type="txt"/>
             </td>
         </tr>
         <tr class="list_one">
@@ -49,7 +49,7 @@
             <td class="FormRowValue">
                 <input onclick="selectFilter('HTPL');" name="export_HTPL[HTPL]" type="checkbox" id="htpl"/>
                 <label for="htpl">HTPL</label>
-                <input style="display:none" name="export_HTPL[HTPL_filter]" type="txt"/>
+                <input style="display:none" placeholder="filter" name="export_HTPL[HTPL_filter]" type="txt"/>
             </td>
         </tr>
         <tr class="list_two">
@@ -64,7 +64,7 @@
             <td class="FormRowValue">
                 <input onclick="selectFilter('SERVICE');" name="export_SERVICE[SERVICE]" type="checkbox" id="svc"/>
                 <label for="svc">Services</label>
-                <input style="display:none" name="export_SERVICE[SERVICE_filter]" type="txt"/>
+                <input style="display:none" placeholder="filter" name="export_SERVICE[SERVICE_filter]" type="txt"/>
             </td>
         </tr>
         <tr class="list_two">
@@ -72,7 +72,7 @@
             <td class="FormRowValue">
                 <input onclick="selectFilter('STPL');" name="export_STPL[STPL]" type="checkbox" id="stpl"/>
                 <label for="stpl">STPL</label>
-                <input style="display:none" name="export_STPL[STPL_filter]" type="txt"/>
+                <input style="display:none" placeholder="filter" name="export_STPL[STPL_filter]" type="txt"/>
             </td>
         </tr>
         <tr class="list_one">
@@ -95,7 +95,7 @@
             <td class="FormRowValue">
                 <input onclick="selectFilter('INSTANCE');" name="export_INSTANCE[INSTANCE]" type="checkbox" id="poller"/>
                 <label for="poller">Poller</label>
-                <input style="display:none" name="export_INSTANCE[INSTANCE_filter]" type="txt"/></td>
+                <input style="display:none" placeholder="filter" name="export_INSTANCE[INSTANCE_filter]" type="txt"/></td>
         </tr>
     </table>
 
