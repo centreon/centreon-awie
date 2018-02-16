@@ -62,7 +62,7 @@ class Export
      * @param $type
      * @return string
      */
-    private function GenerateCmd($type)
+    private function generateCmd($type)
     {
         $cmdScript = '';
         $cmdTypeRelation = array(
@@ -75,7 +75,7 @@ class Export
         $res = $this->db->query($query);
 
         while ($row = $res->fetchRow()) {
-            $cmdScript .= $this->GenerateObject('CMD', ';' . $row['command_name']);
+            $cmdScript .= $this->generateObject('CMD', ';' . $row['command_name']);
         }
         return $cmdScript;
     }
@@ -85,19 +85,19 @@ class Export
      * @param $value
      * @return string
      */
-    public function GenerateGroup($object, $value)
+    public function generateGroup($object, $value)
     {
         if ($object == 'cmd') {
             foreach ($value as $cmdType => $val) {
                 $type = explode('_', $cmdType);
-                return $this->GenerateCmd($type[0]);
+                return $this->generateCmd($type[0]);
             }
         } else {
             if (isset($value[$object])) {
-                return $this->GenerateObject($object);
+                return $this->generateObject($object);
             } elseif (!empty($value[$object . '_filter'])) {
                 $filter = ';' . $value[$object . '_filter'];
-                return $this->GenerateObject($object, $filter);
+                return $this->generateObject($object, $filter);
             }
         }
     }
@@ -107,13 +107,13 @@ class Export
      * @param string $filter
      * @return string
      */
-    public function GenerateObject(
+    public function generateObject(
         $object,
         $filter = ''
     ) {
         $content = '';
         if ($object == 'ACL') {
-            $this->GenerateAcl();
+            $this->generateAcl();
         } else {
             ob_start();
             $option = $object . $filter;
@@ -128,12 +128,12 @@ class Export
     /**
      * @return string
      */
-    private function GenerateAcl()
+    private function generateAcl()
     {
         $aclScript = '';
         $oAcl = array('ACLMENU', 'ACLACTION', 'ACLRESOURCE', 'ACLGROUP');
         foreach ($oAcl as $acl) {
-            $aclScript .= $this->GenerateObject($acl);
+            $aclScript .= $this->generateObject($acl);
         }
         return $aclScript;
     }
@@ -142,7 +142,7 @@ class Export
      * @param $content
      * @return string
      */
-    public function ClapiExport(
+    public function clapiExport(
         $content
     ) {
         $fp = fopen($this->tmpFile, 'w');
