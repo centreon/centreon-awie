@@ -33,6 +33,9 @@
  *
  */
 
+/**
+ * Class Export
+ */
 class Export
 {
     protected $bash = array();
@@ -45,6 +48,7 @@ class Export
 
     /**
      * Export constructor.
+     * @param $clapiConnector
      */
     public function __construct($clapiConnector)
     {
@@ -90,10 +94,9 @@ class Export
             }
         } else {
             if (isset($value[$object])) {
-                $filter = '';
-                if (!empty($value[$object . '_filter'])) {
-                    $filter = ';' . $value[$object . '_filter'];
-                }
+                return $this->GenerateObject($object);
+            } elseif (!empty($value[$object . '_filter'])) {
+                $filter = ';' . $value[$object . '_filter'];
                 return $this->GenerateObject($object, $filter);
             }
         }
@@ -104,8 +107,10 @@ class Export
      * @param string $filter
      * @return string
      */
-    public function GenerateObject($object, $filter = '')
-    {
+    public function GenerateObject(
+        $object,
+        $filter = ''
+    ) {
         $content = '';
         if ($object == 'ACL') {
             $this->GenerateAcl();
@@ -134,10 +139,12 @@ class Export
     }
 
     /**
-     *
+     * @param $content
+     * @return string
      */
-    public function ClapiExport($content)
-    {
+    public function ClapiExport(
+        $content
+    ) {
         $fp = fopen($this->tmpFile, 'w');
         foreach ($content as $command) {
             fwrite($fp, utf8_encode($command));
