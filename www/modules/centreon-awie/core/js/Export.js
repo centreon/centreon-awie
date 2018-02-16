@@ -13,7 +13,7 @@ function submitForm() {
         url: "./modules/centreon-awie/core/generateExport.php",
         data: data,
         success: function (data) {
-            var errorMsg = ''
+            var errorMsg = '';
             oData = JSON.parse(data);
             jQuery('#pathFile').val(oData.fileGenerate);
             delete oData.fileGenerate;

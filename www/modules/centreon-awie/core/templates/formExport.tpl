@@ -1,3 +1,5 @@
+<script type='text/javascript' src="./modules/centreon-awie/core/js/Export.js"></script>
+
 <form name="exportForm" id="exportForm" enctype="multipart/form-data">
     <table id="exportTab" class="formTable table">
         <tr class="list_lvl_1">
@@ -105,7 +107,3 @@
 <form name="downloadForm" id="downloadForm" method="post" action="{$formPath}" enctype="multipart/form-data">
     <input name="pathFile" id="pathFile" type="hidden" />
 </form>
-
-
-
-<script type='text/javascript' src="./modules/centreon-awie/core/js/Export.js"></script>
