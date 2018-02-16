@@ -1,8 +1,9 @@
 function selectFilter(selected) {
-    if (jQuery('[name = "export_' + selected + '[' + selected + '_filter]"]').css('display') == 'none') {
-        jQuery('[name = "export_' + selected + '[' + selected + '_filter]"]').css('display', 'block');
+    var elem = jQuery('[name = "export_' + selected + '[' + selected + '_filter]"]');
+    if (jQuery('[name = "export_' + selected + '[' + selected + ']"').prop('checked')) {
+        elem.attr('disabled', 'disabled');
     } else {
-        jQuery('[name = "export_' + selected + '[' + selected + '_filter]"]').css('display', 'none');
+        elem.removeAttr('disabled');
     }
 }
 
