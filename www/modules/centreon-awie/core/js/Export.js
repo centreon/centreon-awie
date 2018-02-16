@@ -9,6 +9,7 @@ function selectFilter(selected) {
 
 function submitForm() {
     var data = jQuery("#exportForm").serializeArray();
+    jQuery(".loadingWrapper").css('display', 'block');
     jQuery.ajax({
         type: "POST",
         url: "./modules/centreon-awie/core/generateExport.php",
@@ -24,6 +25,7 @@ function submitForm() {
                 alert(errorMsg);
             }
             jQuery("#downloadForm").submit();
+            jQuery(".loadingWrapper").css('display', 'none');
         },
     });
     event.preventDefault();
