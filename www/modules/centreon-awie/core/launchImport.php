@@ -104,10 +104,15 @@ if ($zip->open($uploadFile) === true) {
  * Exemple -> "./centreon -u admin -p centreon -i /tmp/clapi-export.txt"
  */
 $finalFile = $confPath . basename($uploadFile, '.zip') . '.txt';
-ob_start();
-$clapiConnector->import($finalFile, $tmpLogFile);
-ob_end_clean();
-$importReturn['response'] = 'Import successfully';
+
+try {
+    ob_start();
+    $clapiConnector->import($finalFile, $tmpLogFile);
+    ob_end_clean();
+    $importReturn['response'] = 'Import successfully';
+} catch (\Exception $e) {
+    $importReturn['error'] = $e->getMessage();
+}
 
 echo json_encode($importReturn);
 exit;
