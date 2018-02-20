@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-
 /**
  *
  * @param uploadField
  */
 function checkSize(uploadField) {
-    if (uploadField.files[0].size > 50000) {
-        alert("Fichier trop volumineux, ne pas dépasser les 500ko");
+    var messageWrapper = jQuery(".msg-wrapper");
+    messageWrapper.hide();
+    if (uploadField.files[0].size > 500000) {
+        messageWrapper
+            .show()
+            .html('<span class="error-msg">File is too large (more than 500ko)</span>');
         uploadField.value = "";
     } else if (uploadField.selectedIndex === 0) {
-        alert("Fichier vide");
+        messageWrapper
+            .show()
+            .html('<span class="error-msg">File is empty</span>');
+        uploadField.value = "";
+    } else if (uploadField.files[0].type !== 'application/zip') {
+        messageWrapper
+            .show()
+            .html('<span class="error-msg">Please update a .zip archive</span>');
         uploadField.value = "";
     }
-
 }
 
 /**
@@ -37,6 +46,8 @@ function submitForm() {
     jQuery(".loadingWrapper").css('display', 'block');
     var formData = new FormData();
     var importFiles = jQuery('#file')[0].files;
+    var messageWrapper = jQuery(".msg-wrapper");
+    messageWrapper.hide();
     formData.append('clapiImport', importFiles[0])
     formData.append('action', 'ajax_file_import');
     jQuery.ajax({
@@ -48,31 +59,17 @@ function submitForm() {
         processData: false,
         contentType: false,
         success: function (data) {
-            var errorMsg = '';
-            errorMsg += data.error;
-            if (errorMsg.length !== 0 && errorMsg !== 'undefined') {
-                errorMsg = errorMsg.replace(",", "\n");
-                alert(errorMsg);
+            jQuery(".loadingWrapper").hide();
+            if (data.error) {
+                messageWrapper
+                    .show()
+                    .html('<span class="error-msg">' + data.error + '</span>');
             } else {
-                var log = data.success;
-                var tabLog = log.split('\n');
-                for (var i = 0; i < tabLog.length; i++) {
-                    jQuery('#logLine').append('<p>' + tabLog[i] +'</p>');
-                }
-                jQuery('#logClapi').css('display', 'block');
+                messageWrapper
+                    .show()
+                    .html('<span class="success-msg">' + data.response + '</span>');
             }
-            jQuery(".loadingWrapper").css('display', 'none');
         },
     });
     event.preventDefault();
-}
-
-
-function viewLog() {
-    var elem = jQuery('#logLine').css('display');
-    if (elem === 'none') {
-        jQuery('#logLine').css('display', 'block');
-    } else {
-        jQuery('#logLine').css('display', 'none');
-    }
 }

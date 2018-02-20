@@ -64,14 +64,14 @@ $tmpLogFile = $uploadDir . 'log' . time() . '.htm';
  */
 
 if (is_null($_FILES['clapiImport'])) {
-    $importReturn['error'] = "file empty";
+    $importReturn['error'] = "File is empty";
     echo json_encode($importReturn);
     exit;
 }
 
 $moveFile = move_uploaded_file($_FILES['clapiImport']['tmp_name'], $uploadFile);
 if (!$moveFile) {
-    $importReturn['error'] = "upload failed";
+    $importReturn['error'] = "Upload failed";
     echo json_encode($importReturn);
     exit;
 }
@@ -88,7 +88,7 @@ if ($zip->open($uploadFile) === true) {
     $zip->close();
 } else {
     if ($zip->open($uploadFile) === false) {
-        $importReturn['error'] = "unzip failed";
+        $importReturn['error'] = "Unzip failed";
         echo json_encode($importReturn);
         exit;
     }
@@ -104,12 +104,10 @@ if ($zip->open($uploadFile) === true) {
  * Exemple -> "./centreon -u admin -p centreon -i /tmp/clapi-export.txt"
  */
 $finalFile = $confPath . basename($uploadFile, '.zip') . '.txt';
-$content = '';
 ob_start();
 $clapiConnector->import($finalFile, $tmpLogFile);
-$content = ob_get_contents();
 ob_end_clean();
-$importReturn['success'] = $content;
+$importReturn['response'] = 'Import successfully';
 
 echo json_encode($importReturn);
 exit;

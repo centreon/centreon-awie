@@ -7,16 +7,22 @@
 
     <table id="exportTab" class="formTable table">
         <tr class="ListHeader">
-            <td class="FormHeader">
-                <h3>| Import objects:</h3>
+            <td class="FormHeader" colspan="2">
+                <h3>| Import objects</h3>
             </td>
         </tr>
-        <tr class="list_lvl_1">
-            <td class="ListColLvl1_name" colspan="2">
-                <h4>Import zip archive <i style="color:red;" size="1">*</i></h4>
+        <tr class="list_one">
+            <td class="FormRowValue" colspan="2">
+                <div class="msg-wrapper msg-center" style="display: none;">
+                </div>
             </td>
-            <td lass="FormRowField">
-                <input onchange="checkSize(this);" type="file" id="file" name="clapiImport" required="required"/>
+        </tr>
+        <tr class="list_two">
+            <td class="FormRowField">
+                <h4>Import zip archive <span class="red">*</span></h4>
+            </td>
+            <td class="FormRowValue">
+                <input onchange="checkSize(this);" type="file" id="file" name="clapiImport" required />
             </td>
         </tr>
     </table>
@@ -25,24 +31,3 @@
     </div>
 
 </form>
-
-<div id="logClapi" style="display: none">
-
-    <table id="logTab" class="formTable table">
-        <tr class="list_lvl_1">
-            <td class="FormRowField"></td>
-            <td lass="FormRowValue">
-                <p>
-                <h5>import successful</h5>
-                <input onclick="viewLog();" class="btc bt_info" value="View log" type="button"/>
-                </p>
-            </td>
-        </tr>
-        <tr class="list_lvl_1">
-            <td class="FormRowField"></td>
-            <td id="logLine" class="FormRowValue" style="display: none">
-            </td>
-        </tr>
-
-    </table>
-</div>
