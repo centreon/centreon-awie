@@ -86,15 +86,26 @@ foreach ($_POST as $object => $value) {
     if(in_array($object, $formValue)){
         $type = explode('_', $object);
         if ($type[0] == 'export') {
-            $scriptContent[] = $oExport->generateGroup($type[1], $value);
+            $generateContent = $oExport->generateGroup($type[1], $value);
+            if(isset($generateContent['error'])){
+                $ajaxReturn['error'][] = $generateContent['error'];
+            } else {
+                $scriptContent[] = $generateContent['result'];
+            }
         } elseif ($type[0] != 'submitC') {
-            $scriptContent[] = $oExport->generateObject($type[0]);
+            $generateContent = $oExport->generateObject($type[0]);
+            if(isset($generateContent['error'])){
+                $ajaxReturn['error'][] = $generateContent['error'];
+            } else {
+                $scriptContent[] = $generateContent['result'];
+            }
         }
     } else {
         $ajaxReturn['error'][] = 'Unknown object : ' . $object;
     }
 
 }
+
 $ajaxReturn['fileGenerate'] = $oExport->clapiExport($scriptContent);
 echo json_encode($ajaxReturn);
 exit;
