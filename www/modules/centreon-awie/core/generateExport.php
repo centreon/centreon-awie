@@ -83,18 +83,18 @@ $oExport = new \Export($clapiConnector);
 
 foreach ($_POST as $object => $value) {
 
-    if(in_array($object, $formValue)){
+    if (in_array($object, $formValue)) {
         $type = explode('_', $object);
         if ($type[0] == 'export') {
             $generateContent = $oExport->generateGroup($type[1], $value);
-            if(isset($generateContent['error'])){
+            if (isset($generateContent['error'])) {
                 $ajaxReturn['error'][] = $generateContent['error'];
             } else {
                 $scriptContent[] = $generateContent['result'];
             }
         } elseif ($type[0] != 'submitC') {
             $generateContent = $oExport->generateObject($type[0]);
-            if(isset($generateContent['error'])){
+            if (isset($generateContent['error'])) {
                 $ajaxReturn['error'][] = $generateContent['error'];
             } else {
                 $scriptContent[] = $generateContent['result'];

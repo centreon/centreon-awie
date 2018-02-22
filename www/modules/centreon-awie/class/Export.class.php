@@ -99,16 +99,17 @@ class Export
             ob_start();
             $option = $object . $filter;
             $this->clapiConnector->addClapiParameter('select', $option);
-            try{
+            try {
                 $this->clapiConnector->export();
                 $result .= ob_get_contents();
                 ob_end_clean();
-            } catch (\Exception $e){
+            } catch (\Exception $e) {
                 $result .= $e->getMessage();
+                ob_end_clean();
             }
         }
 
-        if( preg_match("#Unknown object#i", $result)) {
+        if (preg_match("#Unknown object#i", $result)) {
             $content['error'] = $result;
         } else {
             $content['result'] = $result;
