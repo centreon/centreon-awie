@@ -86,7 +86,7 @@ Utilisez le champ *Filter* pour une seule valeur si vous voulez exporter un mod√
 
 Cochez la case *Service categories* si vous souhaitez exporter toutes les cat√©gories de service. Il n'existe pas de champ *Filter* pour cet objet.
 
-Export des Contacts
+Export des contacts
 ===================
 
 .. image:: _static/images/contacts.png
