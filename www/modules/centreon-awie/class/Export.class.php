@@ -32,9 +32,9 @@ class Export
      * Export constructor.
      * @param $clapiConnector
      */
-    public function __construct($clapiConnector, $dependencyInjector)
+    public function __construct($clapiConnector)
     {
-        $this->db = $dependencyInjector['configuration_db'];
+        $this->db = new \CentreonDB();
         $this->clapiConnector = $clapiConnector;
         $this->tmpName = 'centreon-clapi-export-' . time();
         $this->tmpFile = '/tmp/' . $this->tmpName . '.txt';
@@ -56,7 +56,7 @@ class Export
         $query = 'SELECT `command_name` FROM `command`WHERE `command_type` =' . $cmdTypeRelation[$type];
         $res = $this->db->query($query);
 
-        while ($row = $res->fetch()) {
+        while ($row = $res->fetchRow()) {
             $result = $this->generateObject('CMD', ';' . $row['command_name']);
             $cmdScript['result'] .= $result['result'];
             $cmdScript['error'] .= $result['error'];
@@ -99,7 +99,7 @@ class Export
 
             $query = 'SELECT `id` FROM `nagios_server` WHERE `name` = "' . $value['INSTANCE_filter'] . '"';
             $res = $this->db->query($query);
-            while ($row = $res->fetch()) {
+            while ($row = $res->fetchRow()) {
                 $pollerId = $row['id'];
             }
 
@@ -115,7 +115,7 @@ class Export
                 . ' AND cr.resource_id = r.resource_id';
 
             $res = $this->db->query($query);
-            while ($row = $res->fetch()) {
+            while ($row = $res->fetchRow()) {
                 $filter = ';' . $row['resource_name'];
                 $result = $this->generateObject('RESOURCECFG', $filter);
                 $cmdScript['result'] .= $result['result'];
@@ -125,7 +125,7 @@ class Export
             //export broker cfg
             $query = 'SELECT b.config_name FROM cfg_centreonbroker b WHERE b.ns_nagios_server =' . $pollerId;
             $res = $this->db->query($query);
-            while ($row = $res->fetch()) {
+            while ($row = $res->fetchRow()) {
                 $filter = ';' . $row['config_name'];
                 $result = $this->generateObject('CENTBROKERCFG', $filter);
                 $cmdScript['result'] .= $result['result'];
@@ -135,7 +135,7 @@ class Export
             //export engine cfg
             $query = 'SELECT n.nagios_name FROM cfg_nagios n WHERE n.nagios_server_id =' . $pollerId;
             $res = $this->db->query($query);
-            while ($row = $res->fetch()) {
+            while ($row = $res->fetchRow()) {
                 $filter = ';' . $row['nagios_name'];
                 $result = $this->generateObject('ENGINECFG', $filter);
                 $cmdScript['result'] .= $result['result'];
