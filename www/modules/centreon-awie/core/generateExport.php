@@ -34,7 +34,6 @@ set_include_path(implode(PATH_SEPARATOR, array(
 require_once _CLAPI_CLASS_ . "/centreonUtils.class.php";
 require_once _CLAPI_CLASS_ . "/centreonAPI.class.php";
 
-
 $formValue = array(
     'export_cmd',
     'TP',
@@ -42,11 +41,11 @@ $formValue = array(
     'CG',
     'export_HOST',
     'export_HTPL',
-    'HG',
+    'export_HG',
     'HC',
     'export_SERVICE',
     'export_STPL',
-    'SG',
+    'export_SG',
     'SC',
     'ACL',
     'LDAP',

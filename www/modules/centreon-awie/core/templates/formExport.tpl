@@ -54,7 +54,7 @@
             </td>
         </tr>
         <tr class="list_two">
-            <td class="FormRowField">Host templates</td>
+            <td class="FormRowField">Host groups</td>
             <td class="FormRowValue">
                 <input onclick="selectFilter('HG');" name="export_HG[HG]" type="checkbox" id="hg"/>
                 <label for="hg">All</label>
@@ -96,7 +96,7 @@
             </td>
         </tr>
         <tr class="list_one">
-            <td class="FormRowField">Service templates</td>
+            <td class="FormRowField">Service groups</td>
             <td class="FormRowValue">
                 <input onclick="selectFilter('SG');" name="export_SG[SG]" type="checkbox" id="sg"/>
                 <label for="sg">All</label>
