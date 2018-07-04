@@ -50,7 +50,7 @@ Utilisez le champ *Filter* pour une seule valeur si vous souhaitez exporter un m
 
 **Groupe d'hôte**
 
-.. image:: _static/images/hostsgroups.png
+.. image:: _static/images/hostgroups.png
    :align: center
 
 Cochez la case *Host groups* si vous désirez exporter tous les groupes d'hôtes.
@@ -90,7 +90,7 @@ Utilisez le champ *Filter* pour une seule valeur si vous voulez exporter un mod�
 
 **Groupes de service**
 
-.. image:: _static/images/servicesgroups.png
+.. image:: _static/images/servicegroups.png
    :align: center
 
 Cochez la case *Service groups* si vous souhaitez exporter tous les groupes de service.

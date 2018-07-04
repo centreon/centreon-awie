@@ -50,10 +50,10 @@ Use the *Filter* field for one single value if you want to export one specific h
 
 **Host groups**
 
-.. image:: _static/images/hostsgroups.png
+.. image:: _static/images/hostgroups.png
    :align: center
 
-Check the *Host groups* check-box if you want to export all hosts groups.
+Check the *Host groups* check-box if you want to export all host groups.
 
 Use the *Filter* field for one single value if you want to export one specific host groups.
 
@@ -90,7 +90,7 @@ Use the *Filter* field for one single value if you want to export one specific s
 
 **Service groups**
 
-.. image:: _static/images/servicesgroups.png
+.. image:: _static/images/servicegroups.png
    :align: center
 
 Check the *Service groups* check-box if you want to export all service groups.
