@@ -35,7 +35,6 @@ require_once _CLAPI_LIB_ . "/Centreon/Db/Manager/Manager.php";
 require_once _CLAPI_CLASS_ . "/centreonUtils.class.php";
 require_once _CLAPI_CLASS_ . "/centreonAPI.class.php";
 
-
 $formValue = array(
     'export_cmd',
     'TP',
@@ -43,9 +42,11 @@ $formValue = array(
     'CG',
     'export_HOST',
     'export_HTPL',
+    'export_HG',
     'HC',
     'export_SERVICE',
     'export_STPL',
+    'export_SG',
     'SC',
     'ACL',
     'LDAP',
