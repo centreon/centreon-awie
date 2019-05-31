@@ -63,7 +63,7 @@ class ClapiObject
 
     /**
      * Export
-     * 
+     *
      * @param $withoutClose disable using of PHP exit function (default: false)
      * @return mixed
      */

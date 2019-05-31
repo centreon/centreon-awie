@@ -39,7 +39,7 @@ class Export
         $this->tmpName = 'centreon-clapi-export-' . time();
         $this->tmpFile = '/tmp/' . $this->tmpName . '.txt';
     }
-    
+
     /**
      * @param $type
      * @return array
@@ -109,7 +109,7 @@ class Export
             $result = $this->generateObject('INSTANCE', $filter);
             $cmdScript['result'] = $result['result'];
             $cmdScript['error'] = $result['error'];
-            
+
             // check is missed pollerId
             if ($pollerId === null) {
                 return $cmdScript;
@@ -175,7 +175,7 @@ class Export
             }
         }
     }
-    
+
     /**
      * @param $object
      * @param string $filter
