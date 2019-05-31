@@ -93,10 +93,7 @@ class Export
             $result = $this->generateObject('ENGINECFG');
             $cmdScript['result'] .= $result['result'];
             $cmdScript['error'] .= $result['error'];
-
-
         } elseif (!empty($value['INSTANCE_filter'])) {
-
             $query = 'SELECT `id` FROM `nagios_server` WHERE `name` = "' . $value['INSTANCE_filter'] . '"';
             $res = $this->db->query($query);
             $pollerId = null;

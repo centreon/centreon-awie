@@ -83,6 +83,4 @@ class ClapiObject
         $import = $this->clapiConnector->import($fileName);
         return $import;
     }
-
-
 }
