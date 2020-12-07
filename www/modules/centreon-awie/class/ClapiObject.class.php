@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2018 Centreon
+ * Copyright 2018-2019 Centreon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class ClapiObject
 
     /**
      * Export
-     * 
+     *
      * @param $withoutClose disable using of PHP exit function (default: false)
      * @return mixed
      */
@@ -83,6 +83,4 @@ class ClapiObject
         $import = $this->clapiConnector->import($fileName);
         return $import;
     }
-
-
 }

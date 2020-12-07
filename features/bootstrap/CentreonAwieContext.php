@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright 2018 Centreon
+** Copyright 2018-2019 Centreon
 **
 ** All rights reserved.
 */
