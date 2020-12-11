@@ -13,23 +13,7 @@ stage('Source') {
 
 try {
   stage('Unit tests') {
-    parallel 'centos6': {
-      /*
-      node {
-        sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/awie/3.4/mon-awie-unittest.sh centos6'
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'PHPUnitJunitHudsonTestType', pattern: 'ut.xml']]
-        ])
-      }
-      */
-    },
-    'centos7': {
+    parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
         /*
@@ -68,13 +52,7 @@ try {
   }
 
   stage('Package') {
-    parallel 'centos6': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/awie/3.4/mon-awie-package.sh centos6'
-      }
-    },
-    'centos7': {
+    parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
         sh './centreon-build/jobs/awie/3.4/mon-awie-package.sh centos7'
@@ -86,13 +64,7 @@ try {
   }
 
   stage('Bundle') {
-    parallel 'centos6': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/awie/3.4/mon-awie-bundle.sh centos6'
-      }
-    },
-    'centos7': {
+    parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
         sh './centreon-build/jobs/awie/3.4/mon-awie-bundle.sh centos7'
@@ -104,22 +76,7 @@ try {
   }
 
   stage('Acceptance tests') {
-    parallel 'centos6': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh './centreon-build/jobs/awie/3.4/mon-awie-acceptance.sh centos6'
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'JUnitType', pattern: 'xunit-reports/**/*.xml']]
-        ])
-        archiveArtifacts allowEmptyArchive: true, artifacts: 'acceptance-logs/*.txt, acceptance-logs/*.png'
-      }
-    },
-    'centos7': {
+    parallel 'centos7': {
       node {
         sh 'setup_centreon_build.sh'
         sh './centreon-build/jobs/awie/3.4/mon-awie-acceptance.sh centos7'
