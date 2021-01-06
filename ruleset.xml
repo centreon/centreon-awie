@@ -17,6 +17,7 @@
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
         <exclude-pattern>features</exclude-pattern>
         <exclude-pattern>www/class</exclude-pattern>
+        <exclude-pattern>www/modules</exclude-pattern>
     </rule>
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
         <exclude-pattern>features</exclude-pattern>
