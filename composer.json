@@ -3,6 +3,10 @@
     "version": "21.04.0",
     "type": "project",
     "license": "Apache-2.0",
+    "scripts": {
+        "codestyle": "phpcs --extensions=php --standard=./ruleset.xml ./",
+        "codestyle:ci": "@codestyle --report=checkstyle --report-file=./build/checkstyle.xml --no-cache"
+    },
     "config": {
         "secure-http": false,
         "platform": {
