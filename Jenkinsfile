@@ -37,9 +37,30 @@ stage('Source') {
     ])
   }
 }
-
 try {
   stage('Unit tests') {
+    parallel 'centos7': {
+      node {
+        sh 'setup_centreon_build.sh'
+        /*
+        sh "./centreon-build/jobs/awie/${serie}/mon-awie-unittest.sh centos7"
+        junit 'ut.xml'
+        if (currentBuild.result == 'UNSTABLE')
+          currentBuild.result = 'FAILURE'
+        step([
+          $class: 'CloverPublisher',
+          cloverReportDir: '.',
+          cloverReportFileName: 'coverage.xml'
+        ])
+        step([
+          $class: 'hudson.plugins.checkstyle.CheckStylePublisher',
+          pattern: 'codestyle.xml',
+          usePreviousBuildAsReference: true,
+          useDeltaValues: true,
+          failedNewAll: '0'
+        ])
+        */
+
         // Run sonarQube analysis
         withSonarQubeEnv('SonarQubeDev') {
           sh "./centreon-build/jobs/awie/${serie}/mon-awie-analysis.sh"
