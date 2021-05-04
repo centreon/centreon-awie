@@ -103,10 +103,9 @@ try {
     $clapiConnector->import($finalFile, $tmpLogFile);
     ob_end_clean();
     $importReturn['response'] = 'Import successful';
-    unlink($uploadFile);
 } catch (\Exception $e) {
     $importReturn['error'] = $e->getMessage();
 }
-
+unlink($uploadFile);
 echo json_encode($importReturn);
 exit;
