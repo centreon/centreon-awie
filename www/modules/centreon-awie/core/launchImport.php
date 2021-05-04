@@ -60,7 +60,9 @@ if (!isset($_FILES['clapiImport']) || is_null($_FILES['clapiImport'])) {
 $uploadDir = _CENTREON_CACHEDIR_ . '/';
 $uploadFile = $uploadDir . basename($_FILES['clapiImport']['name']);
 $tmpLogFile = $uploadDir . 'log' . time() . '.htm';
-
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir);
+}
 $moveFile = move_uploaded_file($_FILES['clapiImport']['tmp_name'], $uploadFile);
 if (!$moveFile) {
     $importReturn['error'] = "Upload failed";
@@ -101,6 +103,7 @@ try {
     $clapiConnector->import($finalFile, $tmpLogFile);
     ob_end_clean();
     $importReturn['response'] = 'Import successful';
+    unlink($uploadFile);
 } catch (\Exception $e) {
     $importReturn['error'] = $e->getMessage();
 }
