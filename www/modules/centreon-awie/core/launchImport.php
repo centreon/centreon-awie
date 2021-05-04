@@ -51,10 +51,12 @@ if (!isset($_FILES['clapiImport']) || is_null($_FILES['clapiImport'])) {
     exit;
 }
 
-$uploadDir = '/usr/share/centreon/filesUpload/';
+$uploadDir = _CENTREON_CACHEDIR_ . '/';
 $uploadFile = $uploadDir . basename($_FILES['clapiImport']['name']);
 $tmpLogFile = $uploadDir . 'log' . time() . '.htm';
-
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir);
+}
 $moveFile = move_uploaded_file($_FILES['clapiImport']['tmp_name'], $uploadFile);
 if (!$moveFile) {
     $importReturn['error'] = "Upload failed";
@@ -66,8 +68,8 @@ if (!$moveFile) {
 /**
  * Dezippe file
  */
-$zip = new ZipArchive;
-$confPath = '/usr/share/centreon/filesUpload/';
+$zip = new ZipArchive();
+$confPath = _CENTREON_CACHEDIR_ . '/filesUpload/';
 
 if ($zip->open($uploadFile) === true) {
     $zip->extractTo($confPath);
@@ -99,6 +101,6 @@ try {
 } catch (\Exception $e) {
     $importReturn['error'] = $e->getMessage();
 }
-
+unlink($uploadFile);
 echo json_encode($importReturn);
 exit;
