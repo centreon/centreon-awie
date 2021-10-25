@@ -32,7 +32,7 @@ Centreon AWIE is based on CLAPI commands but its added value is to allow using C
 $module_conf['centreon-awie']["is_removeable"] = "1";
 $module_conf['centreon-awie']["author"] = "Centreon";
 $module_conf['centreon-awie']["stability"] = "stable";
-$module_conf['centreon-awie']["last_update"] = "2021-04-24";
+$module_conf['centreon-awie']["last_update"] = "2021-10-24";
 $module_conf['centreon-awie']["release_note"] =
     "https://documentation.centreon.com/21.10/en/releases/centreon-os-extensions.html";
 $module_conf['centreon-awie']["images"] = [
