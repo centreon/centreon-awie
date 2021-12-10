@@ -58,7 +58,7 @@ rm -rf $RPM_BUILD_ROOT
 
 #filesUpload
 %{__install} -d %{_datadir}/centreon/filesUpload
-%attr(-,centreon,centreon) {_datadir}/centreon/filesUpload
+%attr(755,centreon,centreon) {_datadir}/centreon/filesUpload
 
 %changelog
 * Wed Jan 6 2021 sc979 <schapron@centreon.com> 21.04.0
