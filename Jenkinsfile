@@ -123,12 +123,18 @@ try {
       node {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos7"
+	archiveArtifacts artifacts: 'rpms-centos7.tar.gz'
+        stash name: "rpms-centos7", includes: 'output/noarch/*.rpm'
+        sh 'rm -rf output'
       }
     },
     'centos8': {
       node {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos8"
+	archiveArtifacts artifacts: 'rpms-centos8.tar.gz'
+        stash name: "rpms-centos8", includes: 'output/noarch/*.rpm'
+        sh 'rm -rf output'
       }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
@@ -166,6 +172,8 @@ try {
     stage('Delivery') {
       node {
         sh 'setup_centreon_build.sh'
+	unstash 'rpms-centos7'
+        unstash 'rpms-centos8'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
       }
       if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
