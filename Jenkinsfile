@@ -77,10 +77,11 @@ try {
   // sonarQube step to get qualityGate result
   stage('Quality gate') {
       node {
-        sleep 120
-        def qualityGate = waitForQualityGate()
-        if (qualityGate.status != 'OK') {
-          currentBuild.result = 'FAIL'
+        timeout(time: 10, unit: 'MINUTES') {
+          def qualityGate = waitForQualityGate()
+          if (qualityGate.status != 'OK') {
+            currentBuild.result = 'FAIL'
+          }
         }
         if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
           error("Quality gate failure: ${qualityGate.status}.");
