@@ -48,7 +48,7 @@ find .          \
 rm -rf $RPM_BUILD_ROOT
 %{__install} -d %buildroot%{centreon_www}/modules/%{name}
 %{__cp} -rp www/modules/%{name}/* %buildroot%{centreon_www}/modules/%{name}
-%{__install} -d -m 0770 %buildroot%{_localstatedir}/cache/centreon/filesUploadg
+%{__install} -d -m 0770 %buildroot%{_localstatedir}/cache/centreon/filesUpload
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -57,7 +57,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %attr(-,apache,apache) %{centreon_www}/modules/%{name}
 %defattr(0664, centreon, centreon, 0770)
-%{_localstatedir}/cache/centreon/filesUploadg
+%{_localstatedir}/cache/centreon/filesUpload
 
 %changelog
 * Wed Jan 6 2021 sc979 <schapron@centreon.com> 21.04.0
