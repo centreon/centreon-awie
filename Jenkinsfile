@@ -188,18 +188,18 @@ try {
         archiveArtifacts allowEmptyArchive: true, artifacts: 'acceptance-logs/*.txt, acceptance-logs/*.png'
       }
     }
-/*
-    'centos8': {
-      node {
-        checkoutCentreonBuild(buildBranch)
-        sh "./centreon-build/jobs/awie/${serie}/mon-awie-acceptance.sh centos8"
-        junit 'xunit-reports/**/*.xml'
-        if (currentBuild.result == 'UNSTABLE')
-          currentBuild.result = 'FAILURE'
-        archiveArtifacts allowEmptyArchive: true, artifacts: 'acceptance-logs/*.txt, acceptance-logs/*.png'
-      }
-    }
-*/
+//
+//    'centos8': {
+//      node {
+//        checkoutCentreonBuild(buildBranch)
+//        sh "./centreon-build/jobs/awie/${serie}/mon-awie-acceptance.sh centos8"
+//        junit 'xunit-reports/**/*.xml'
+//        if (currentBuild.result == 'UNSTABLE')
+//          currentBuild.result = 'FAILURE'
+//        archiveArtifacts allowEmptyArchive: true, artifacts: 'acceptance-logs/*.txt, acceptance-logs/*.png'
+//      }
+//    }
+//
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Acceptance tests stage failure.');
     }
