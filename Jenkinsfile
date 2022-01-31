@@ -183,7 +183,7 @@ try {
           currentBuild.result = 'FAILURE'
         archiveArtifacts allowEmptyArchive: true, artifacts: 'acceptance-logs/*.txt, acceptance-logs/*.png'
       }
-    },
+    }
 //    'centos8': {
 //      node {
 //        checkoutCentreonBuild(buildBranch)
