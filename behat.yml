@@ -10,6 +10,6 @@ default:
     cache: ~
   suites:
     import_export_features:
-      paths: [ %paths.base%/features/ImportExport.feature ]
+      paths: [ "%paths.base%/features/ImportExport.feature" ]
       contexts:
           - ImportExportContext
