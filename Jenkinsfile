@@ -87,28 +87,16 @@ try {
           error("Quality gate failure: ${qualityGate.status}.");
         }
       }
-    }
-
-  stage('Package') {
-    parallel 'centos7': {
+    },
+    'Packaging alma8': {
       node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh centos7"
-	archiveArtifacts artifacts: 'rpms-centos7.tar.gz'
-        stash name: "rpms-centos7", includes: 'output/noarch/*.rpm'
+        checkoutCentreonBuild(buildBranch)
+        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
+        archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
+        stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
         sh 'rm -rf output'
-
       }
     }
-//    'centos8': {
-//      node {
-//        sh 'setup_centreon_build.sh'
-//        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh centos8"
-//	archiveArtifacts artifacts: 'rpms-centos8.tar.gz'
-//        stash name: "rpms-centos8", includes: 'output/noarch/*.rpm'
-//        sh 'rm -rf output'
-//      }
-//    }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Package stage failure.');
     }
@@ -117,7 +105,21 @@ try {
   stage('Bundle') {
     parallel 'centos7': {
       node {
-        sh 'setup_centreon_build.sh'
+        unstash 'rpms-alma8'
+        unstash 'rpms-centos7'
+        checkoutCentreonBuild(buildBranch)
+        sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
+      }
+      if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
+        error('Delivery stage failure.');
+      }
+    }
+  }
+
+  stage('Docker creation') {
+    parallel 'Docker centos7': {
+      node {
+        checkoutCentreonBuild(buildBranch)
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos7"
       }
     }
