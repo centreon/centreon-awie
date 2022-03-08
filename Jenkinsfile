@@ -127,12 +127,12 @@ try {
         sh 'rm -rf output'
       }
     },
-    'Packaging centos8': {
+    'Packaging alma8': {
       node {
         checkoutCentreonBuild(buildBranch)
-        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh centos8"
-        archiveArtifacts artifacts: 'rpms-centos8.tar.gz'
-        stash name: "rpms-centos8", includes: 'output/noarch/*.rpm'
+        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
+        archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
+        stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
         sh 'rm -rf output'
       }
     }
@@ -144,7 +144,7 @@ try {
   if ((env.BUILD == 'CI')) {
     stage('Delivery to unstable') {
       node {
-        //unstash 'rpms-centos8'
+        unstash 'rpms-alma8'
         unstash 'rpms-centos7'
         checkoutCentreonBuild(buildBranch)
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
