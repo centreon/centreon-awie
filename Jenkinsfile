@@ -41,8 +41,8 @@ stage('Source') {
 }
 
 try {
-  stage('Unit tests') {
-    parallel 'centos7': {
+  stage('Unit tests // RPM Packaging // Sonar analysis') {
+    parallel 'unit tests centos7': {
       node {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-unittest.sh centos7"
@@ -79,6 +79,30 @@ try {
         withSonarQubeEnv('SonarQubeDev') {
           sh "./centreon-build/jobs/awie/${serie}/mon-awie-analysis.sh"
         }
+        timeout(time: 10, unit: 'MINUTES') {
+          def qualityGate = waitForQualityGate()
+          if (qualityGate.status != 'OK') {
+            currentBuild.result = 'FAIL'
+          }
+        }
+      }
+    },
+    'Packaging centos7': {
+      node {
+        checkoutCentreonBuild(buildBranch)
+        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh centos7"
+        archiveArtifacts artifacts: 'rpms-centos7.tar.gz'
+        stash name: "rpms-centos7", includes: 'output/noarch/*.rpm'
+        sh 'rm -rf output'
+      }
+    },
+    'Packaging alma8': {
+      node {
+        checkoutCentreonBuild(buildBranch)
+        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
+        archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
+        stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
+        sh 'rm -rf output'
       }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
@@ -86,35 +110,7 @@ try {
     }
   }
 
-  // sonarQube step to get qualityGate result
-  stage('Quality gate') {
-    node {
-      timeout(time: 10, unit: 'MINUTES') {
-        def qualityGate = waitForQualityGate()
-        if (qualityGate.status != 'OK') {
-          currentBuild.result = 'FAIL'
-        }
-      }
-    }
-    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-      error("Quality gate failure: ${qualityGate.status}.");
-    }
-  }
-
-  stage('Packaging alma8'): {
-    node {
-      checkoutCentreonBuild(buildBranch)
-      sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
-      archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
-      stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
-      sh 'rm -rf output'
-    }
-    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-      error('Package stage failure.');
-    }
-  }
-
-  stage('Bundle') {
+  stage('Delivery to unstable') {
     parallel 'centos7': {
       node {
         unstash 'rpms-alma8'
