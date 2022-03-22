@@ -89,7 +89,7 @@ try {
     },
     'Packaging centos7': {
       node {
-        checkoutCentreonBuild(buildBranch)
+        sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh centos7"
         archiveArtifacts artifacts: 'rpms-centos7.tar.gz'
         stash name: "rpms-centos7", includes: 'output/noarch/*.rpm'
