@@ -98,7 +98,7 @@ try {
     },
     'Packaging alma8': {
       node {
-        checkoutCentreonBuild(buildBranch)
+        sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
         archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
         stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
@@ -115,7 +115,7 @@ try {
       node {
         unstash 'rpms-alma8'
         unstash 'rpms-centos7'
-        checkoutCentreonBuild(buildBranch)
+        sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
       }
     }
@@ -127,7 +127,7 @@ try {
   stage('Docker creation') {
     parallel 'Docker centos7': {
       node {
-        checkoutCentreonBuild(buildBranch)
+        sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos7"
       }
     }
