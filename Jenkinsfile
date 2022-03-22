@@ -88,26 +88,26 @@ try {
 
   // sonarQube step to get qualityGate result
   stage('Quality gate') {
-      node {
-        timeout(time: 10, unit: 'MINUTES') {
-          def qualityGate = waitForQualityGate()
-          if (qualityGate.status != 'OK') {
-            currentBuild.result = 'FAIL'
-          }
-        }
-        if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-          error("Quality gate failure: ${qualityGate.status}.");
+    node {
+      timeout(time: 10, unit: 'MINUTES') {
+        def qualityGate = waitForQualityGate()
+        if (qualityGate.status != 'OK') {
+          currentBuild.result = 'FAIL'
         }
       }
-    },
-    'Packaging alma8': {
-      node {
-        checkoutCentreonBuild(buildBranch)
-        sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
-        archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
-        stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
-        sh 'rm -rf output'
+      if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
+        error("Quality gate failure: ${qualityGate.status}.");
       }
+    }
+  }
+
+  stage('Packaging alma8'): {
+    node {
+      checkoutCentreonBuild(buildBranch)
+      sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
+      archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
+      stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
+      sh 'rm -rf output'
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Package stage failure.');
