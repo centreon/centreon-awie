@@ -95,9 +95,9 @@ try {
           currentBuild.result = 'FAIL'
         }
       }
-      if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-        error("Quality gate failure: ${qualityGate.status}.");
-      }
+    }
+    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
+      error("Quality gate failure: ${qualityGate.status}.");
     }
   }
 
@@ -122,9 +122,9 @@ try {
         checkoutCentreonBuild(buildBranch)
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
       }
-      if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-        error('Delivery stage failure.');
-      }
+    }
+    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
+      error('Delivery stage failure.');
     }
   }
 
