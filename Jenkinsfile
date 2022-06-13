@@ -171,7 +171,6 @@ try {
   if ((env.BUILD == 'RELEASE') || (env.BUILD == 'REFERENCE')) {
     stage('Delivery') {
       node {
-#        sh 'setup_centreon_build.sh'
         checkoutCentreonBuild()
 	unstash 'rpms-centos7'
         unstash 'rpms-alma8'
