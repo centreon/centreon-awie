@@ -96,7 +96,6 @@ try {
     },
     'Packaging alma8': {
       node {
-#        sh 'setup_centreon_build.sh'
         checkoutCentreonBuild(buildBranch)
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
         archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
