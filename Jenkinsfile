@@ -131,7 +131,7 @@ try {
     }
     'alma8': {
       node {
-        checkoutCentreonBuild(buildBranch)
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh alma8"
       }
     }
