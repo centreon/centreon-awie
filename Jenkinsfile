@@ -157,7 +157,7 @@ try {
     'alma8': {
       node {
 #        sh 'setup_centreon_build.sh'
-        checkoutCentreonBuild(buildBranch)
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-acceptance.sh alma8"
         junit 'xunit-reports/**/*.xml'
         if (currentBuild.result == 'UNSTABLE')
