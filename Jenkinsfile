@@ -31,7 +31,7 @@ if (env.BRANCH_NAME.startsWith('release-')) {
 */
 stage('Source') {
   node {
-    checkoutCentreonBuild(buildBranch)
+    checkoutCentreonBuild()
     dir('centreon-awie') {
       checkout scm
     }
