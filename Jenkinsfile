@@ -128,7 +128,7 @@ try {
         checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos7"
       }
-    }
+    },
     'alma8': {
       node {
         checkoutCentreonBuild()
@@ -150,7 +150,7 @@ try {
           currentBuild.result = 'FAILURE'
         archiveArtifacts allowEmptyArchive: true, artifacts: 'acceptance-logs/*.txt, acceptance-logs/*.png'
       }
-    }
+    },
     'alma8': {
       node {
         checkoutCentreonBuild()
