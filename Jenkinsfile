@@ -96,7 +96,7 @@ try {
     },
     'Packaging alma8': {
       node {
-        checkoutCentreonBuild(buildBranch)
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
         archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
         stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
