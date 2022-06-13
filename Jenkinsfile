@@ -125,7 +125,6 @@ try {
   stage('Docker creation') {
     parallel 'Docker centos7': {
       node {
-#        sh 'setup_centreon_build.sh'
         checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos7"
       }
