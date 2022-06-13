@@ -113,7 +113,7 @@ try {
       node {
         unstash 'rpms-alma8'
         unstash 'rpms-centos7'
-        checkoutCentreonBuild(buildBranch)
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
       }
     }
