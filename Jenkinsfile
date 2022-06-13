@@ -53,7 +53,7 @@ try {
   stage('Unit tests // RPM Packaging // Sonar analysis') {
     parallel 'unit tests centos7': {
       node {
-        checkoutCentreonBuild(buildBranch)
+        checkoutCentreonBuild()
         /*
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-unittest.sh centos7"
         junit 'ut.xml'
