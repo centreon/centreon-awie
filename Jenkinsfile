@@ -16,12 +16,22 @@ if (env.BRANCH_NAME.startsWith('release-')) {
   env.BUILD = 'CI'
 }
 
+def checkoutCentreonBuild() {
+  dir('centreon-build') {
+    checkout resolveScm(source: [$class: 'GitSCMSource',
+      remote: 'https://github.com/centreon/centreon-build.git',
+      credentialsId: 'technique-ci',
+      traits: [[$class: 'jenkins.plugins.git.traits.BranchDiscoveryTrait']]],
+      targets: [env.BRANCH_NAME, 'master'])
+  }
+}
+
 /*
 ** Pipeline code.
 */
 stage('Source') {
   node {
-    sh 'setup_centreon_build.sh'
+    checkoutCentreonBuild()
     dir('centreon-awie') {
       checkout scm
     }
@@ -43,7 +53,7 @@ try {
   stage('Unit tests // RPM Packaging // Sonar analysis') {
     parallel 'unit tests centos7': {
       node {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         /*
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-unittest.sh centos7"
         junit 'ut.xml'
@@ -77,7 +87,7 @@ try {
     },
     'Packaging centos7': {
       node {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh centos7"
         archiveArtifacts artifacts: 'rpms-centos7.tar.gz'
         stash name: "rpms-centos7", includes: 'output/noarch/*.rpm'
@@ -86,7 +96,7 @@ try {
     },
     'Packaging alma8': {
       node {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-package.sh alma8"
         archiveArtifacts artifacts: 'rpms-alma8.tar.gz'
         stash name: "rpms-alma8", includes: 'output/noarch/*.rpm'
@@ -103,7 +113,7 @@ try {
       node {
         unstash 'rpms-alma8'
         unstash 'rpms-centos7'
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
       }
     }
@@ -115,13 +125,13 @@ try {
   stage('Docker creation') {
     parallel 'Docker centos7': {
       node {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos7"
       }
     }
 //    'centos8': {
 //      node {
-//        sh 'setup_centreon_build.sh'
+//        checkoutCentreonBuild()
 //        sh "./centreon-build/jobs/awie/${serie}/mon-awie-bundle.sh centos8"
 //      }
 //    }
@@ -133,7 +143,7 @@ try {
   stage('Acceptance tests') {
     parallel 'centos7': {
       node {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-acceptance.sh centos7"
         junit 'xunit-reports/**/*.xml'
         if (currentBuild.result == 'UNSTABLE')
@@ -143,7 +153,7 @@ try {
     }
 //    'centos8': {
 //      node {
-//        sh 'setup_centreon_build.sh'
+//        checkoutCentreonBuild()
 //        sh "./centreon-build/jobs/awie/${serie}/mon-awie-acceptance.sh centos8"
 //        junit 'xunit-reports/**/*.xml'
 //        if (currentBuild.result == 'UNSTABLE')
@@ -159,8 +169,8 @@ try {
   if ((env.BUILD == 'RELEASE') || (env.BUILD == 'REFERENCE')) {
     stage('Delivery') {
       node {
-        sh 'setup_centreon_build.sh'
-	unstash 'rpms-centos7'
+        checkoutCentreonBuild()
+	        unstash 'rpms-centos7'
 //        unstash 'rpms-centos8'
         sh "./centreon-build/jobs/awie/${serie}/mon-awie-delivery.sh"
       }
